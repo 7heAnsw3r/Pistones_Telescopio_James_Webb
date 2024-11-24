@@ -81,57 +81,39 @@ class TelescopioApp(QMainWindow):
 
 
 def costo(pos, A, B, C, x1, y1):
-    """
-    Función de costo para minimizar la posición del espejo.
-    """
     x2, y2 = pos
     PA1_base = np.array([-A / 2, 0])
     PA2_base = np.array([A / 2, 0])
+    
     vector_P = np.array([x1 - x2, y1 - y2])
     vector_L = np.array([-(y1 - y2), x1 - x2])
+    
+    # Asegurarse de que la normalización no cause un problema por división por cero
     norm_vector_L = np.linalg.norm(vector_L)
-    vector_L_normalizado = vector_L / norm_vector_L if norm_vector_L > 1e-6 else np.array([0, 0])
+    if norm_vector_L < 1e-6:  # Si la magnitud del vector es muy pequeña
+        vector_L_normalizado = np.array([0, 0])  # Evitar la división por cero
+    else:
+        vector_L_normalizado = vector_L / norm_vector_L  # Normalizar correctamente
+    
     PA3_espejo = np.array([x2 - (C / 2) * vector_L_normalizado[0], y2 - (C / 2) * vector_L_normalizado[1]])
     PA4_espejo = np.array([x2 + (C / 2) * vector_L_normalizado[0], y2 + (C / 2) * vector_L_normalizado[1]])
+    
     piston1 = np.linalg.norm(PA3_espejo - PA1_base)
     piston2 = np.linalg.norm(PA4_espejo - PA2_base)
-    perpendicularidad = abs(np.dot(vector_P, vector_L))
-    penalizacion_longitud = (
-        max(0, abs(piston1 - B) if piston1 > B else B / 2 - piston1) +
-        max(0, abs(piston2 - B) if piston2 > B else B / 2 - piston2)
-    )
-    return perpendicularidad + penalizacion_longitud
-
-
-def restriccion_angulo(pos, x1, y1):
-    """
-    Restricción para asegurar que el ángulo del espejo sea válido.
-    """
-    x2, y2 = pos
-    vector_P = np.array([x1 - x2, y1 - y2])
     angulo_P = np.degrees(np.arctan2(vector_P[1], vector_P[0]))
-    return 180 - abs(angulo_P)
-
-
-def optimizar_telescopio(A, B, C, x1, y1):
-    """
-    Optimiza la posición del telescopio utilizando scipy.optimize.
-    """
-    x2_inicial, y2_inicial = 0, 3.0
-    restricciones = ({
-        'type': 'ineq',
-        'fun': restriccion_angulo,
-        'args': (x1, y1)
-    })
-    resultado = minimize(
-        costo,
-        [x2_inicial, y2_inicial],
-        args=(A, B, C, x1, y1),
-        bounds=[(-10, 10), (0, 15)],
-        constraints=restricciones
-    )
-    return resultado.x if resultado.success else (None, None)
-
+    
+    perpendicularidad = abs(np.dot(vector_P, vector_L))
+    penalizacion_longitud = 0
+    if not (B / 2 <= piston1 <= B):
+        penalizacion_longitud += abs(piston1 - B) if piston1 > B else abs(piston1 - B / 2)
+    if not (B / 2 <= piston2 <= B):
+        penalizacion_longitud += abs(piston2 - B) if piston2 > B else abs(piston2 - B / 2)
+    
+    penalizacion_angulo = 0
+    if not (0 <= angulo_P <= 180):
+        penalizacion_angulo += abs(angulo_P - 90)
+    
+    return perpendicularidad + penalizacion_longitud + penalizacion_angulo
 
 def iniciar_simulacion_pygame(A, B, C):
     """
@@ -155,8 +137,8 @@ def iniciar_simulacion_pygame(A, B, C):
 
         # Posición del ratón y optimización
         mouse_pos = pygame.mouse.get_pos()
-        x1, y1 = mouse_pos[0] / 100 - 4, 15 - mouse_pos[1] / 40
-        x2_opt, y2_opt = optimizar_telescopio(A, B, C, x1, y1)
+        resultado = minimize(costo, [0, 7.5], args=(A, B, C, mouse_pos[0] / 100 - 4, 15 - mouse_pos[1] / 40))
+        x2_opt, y2_opt = resultado.x
 
         # Dibujar fondo, estrellas y telescopio
         screen.fill((0, 0, 0))
