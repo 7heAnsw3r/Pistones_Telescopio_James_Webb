@@ -24,15 +24,15 @@ class TelescopioApp(QMainWindow):
 
         # Columna izquierda: Campos de entrada
         input_layout = QVBoxLayout()
-        input_layout.addWidget(QLabel("Ingresa el valor de A (positivo):"))
+        input_layout.addWidget(QLabel("Longitud de la Base: "))
         self.input_a = QLineEdit()
         input_layout.addWidget(self.input_a)
 
-        input_layout.addWidget(QLabel("Ingresa el valor de B (positivo):"))
+        input_layout.addWidget(QLabel("Longitud de los pistones: "))
         self.input_b = QLineEdit()
         input_layout.addWidget(self.input_b)
 
-        input_layout.addWidget(QLabel("Ingresa el valor de C (positivo):"))
+        input_layout.addWidget(QLabel("Longitud del espejo secundario: "))
         self.input_c = QLineEdit()
         input_layout.addWidget(self.input_c)
 
@@ -80,10 +80,11 @@ class TelescopioApp(QMainWindow):
             self.statusBar().showMessage(f"Error: {e}")
 
 
-def costo(pos, A, B, C, x1, y1):
+def costo(pos, A, B_min, B_max, C, x1, y1, F):
     x2, y2 = pos
     PA1_base = np.array([-A / 2, 0])
     PA2_base = np.array([A / 2, 0])
+    espejo_primario = np.array([PA1_base[0] + F, 0])
     
     vector_P = np.array([x1 - x2, y1 - y2])
     vector_L = np.array([-(y1 - y2), x1 - x2])
@@ -102,18 +103,22 @@ def costo(pos, A, B, C, x1, y1):
     piston2 = np.linalg.norm(PA4_espejo - PA2_base)
     angulo_P = np.degrees(np.arctan2(vector_P[1], vector_P[0]))
     
-    perpendicularidad = abs(np.dot(vector_P, vector_L))
     penalizacion_longitud = 0
-    if not (B / 2 <= piston1 <= B):
-        penalizacion_longitud += abs(piston1 - B) if piston1 > B else abs(piston1 - B / 2)
-    if not (B / 2 <= piston2 <= B):
-        penalizacion_longitud += abs(piston2 - B) if piston2 > B else abs(piston2 - B / 2)
+    if not (B_min <= piston1 <= B_max):
+        penalizacion_longitud += abs(piston1 - B_max) if piston1 > B_max else abs(piston1 - B_min)
+    if not (B_min <= piston2 <= B_max):
+        penalizacion_longitud += abs(piston2 - B_max) if piston2 > B_max else abs(piston2 - B_min)
     
     penalizacion_angulo = 0
     if not (0 <= angulo_P <= 180):
         penalizacion_angulo += abs(angulo_P - 90)
-    
-    return perpendicularidad + penalizacion_longitud + penalizacion_angulo
+
+    # Penalización por no alinearse con el espejo primario
+    vector_P_3D = np.array([vector_P[0], vector_P[1], 0])
+    vector_espejo_3D = np.array([espejo_primario[0] - x2, espejo_primario[1] - y2, 0])
+    alineacion = np.linalg.norm(np.cross(vector_P_3D, vector_espejo_3D)) / np.linalg.norm(vector_P_3D)
+
+    return alineacion + penalizacion_longitud + penalizacion_angulo
 
 def iniciar_simulacion_pygame(A, B, C):
     """
@@ -135,9 +140,26 @@ def iniciar_simulacion_pygame(A, B, C):
             if event.type == pygame.QUIT:
                 running = False
 
-        # Posición del ratón y optimización
+        # Posición del ratón
         mouse_pos = pygame.mouse.get_pos()
-        resultado = minimize(costo, [0, 7.5], args=(A, B, C, mouse_pos[0] / 100 - 4, 15 - mouse_pos[1] / 40))
+
+        # Calcular posición opuesta
+        screen_center = (size[0] / 2, size[1] / 2)
+        opposite_mouse_pos = (
+            screen_center[0] - (mouse_pos[0] - screen_center[0]),
+            screen_center[1] - (mouse_pos[1] - screen_center[1]),
+        )
+
+        # Optimización para la nueva posición
+        x2_inicial, y2_inicial = 0, 3.0
+        B_min, B_max = B / 2, B
+        F = 3
+        resultado = minimize(
+            costo,
+            [x2_inicial, y2_inicial],
+            args=(A, B_min, B_max, C, opposite_mouse_pos[0] / 100 - 4, 15 - opposite_mouse_pos[1] / 40, F),
+            bounds=[(-10, 10), (0, 15)]
+        )
         x2_opt, y2_opt = resultado.x
 
         # Dibujar fondo, estrellas y telescopio
@@ -150,14 +172,28 @@ def iniciar_simulacion_pygame(A, B, C):
 
         base_x, base_y = 400, 600
         if x2_opt is not None:
-            pygame.draw.rect(screen, (128, 128, 128), (base_x - A * 25, base_y - 10, A * 50, 20))
-            pygame.draw.rect(screen, (255, 0, 0), (base_x - A * 25, base_y - 10, 5, -(y2_opt * 40)))
-            pygame.draw.rect(screen, (255, 0, 0), (base_x + A * 25 - 5, base_y - 10, 5, -(y2_opt * 40)))
             espejo_x = base_x + x2_opt * 100
             espejo_y = base_y - y2_opt * 40
-            pygame.draw.circle(screen, (0, 0, 255), (int(espejo_x), int(espejo_y)), int(C * 20))
-            pygame.draw.line(screen, (255, 255, 0), (base_x - A * 25, base_y), (espejo_x, espejo_y), 2)
-            pygame.draw.line(screen, (255, 255, 0), (base_x + A * 25, base_y), (espejo_x, espejo_y), 2)
+            
+            pygame.draw.rect(screen, (128, 128, 128), (base_x - A * 25, base_y - 10, A * 50, 20))
+            pygame.draw.circle(screen, (0, 0, 255, 5), (int(base_x), int(base_y)), int(C * 20))
+
+            # Lineas Amarillas
+            pygame.draw.line(screen, (255, 255, 0), (base_x - A * 25, base_y), (espejo_x - C, espejo_y), 2)
+            pygame.draw.line(screen, (255, 255, 0), (base_x + A * 25, base_y), (espejo_x + C, espejo_y), 2)
+
+            # Líneas Rojas (mitad de las amarillas)
+            mitad_x_1 = base_x - A * 25 + (espejo_x - 5 - (base_x - A * 25)) / 2
+            mitad_y_1 = base_y + (espejo_y - base_y) / 2
+            pygame.draw.line(screen, (255, 0, 0), (base_x - A * 25, base_y), (mitad_x_1, mitad_y_1), 5)
+
+            mitad_x_2 = base_x + A * 25 + (espejo_x + 5 - (base_x + A * 25)) / 2
+            mitad_y_2 = base_y + (espejo_y - base_y) / 2
+            pygame.draw.line(screen, (255, 0, 0), (base_x + A * 25, base_y), (mitad_x_2, mitad_y_2), 5)
+            
+            # Espejo
+            ancho_espejo = C*2
+            pygame.draw.rect(screen, (128, 128, 128), (espejo_x - C, espejo_y, ancho_espejo, 4))
 
         # Mostrar texto informativo
         info_text = f"A: {A:.2f}, B: {B:.2f}, C: {C:.2f}, x: {x2_opt:.2f}, y: {y2_opt:.2f}"
@@ -168,6 +204,7 @@ def iniciar_simulacion_pygame(A, B, C):
         clock.tick(30)
 
     pygame.quit()
+
 
 
 if __name__ == "__main__":
