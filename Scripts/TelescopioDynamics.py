@@ -4,19 +4,12 @@ from scipy.optimize import minimize
 import numpy as np
 import matplotlib.pyplot as plt
 
-# David tienes que corregir los bugs, ademas tienes que mejorar la interfaz donde el usuario ingresa los valores, por favor
-# Tienes que quitar el B minimo a la interfaz ya que ese tiene que ser la mitad del maximo
-# Ten en cuenta que te toca lo mas facil, asi que no nos decepciones por favor, hay mucho puede ser algo asi
-# puede ser algo asi https://codigospython.com/python-para-la-programacion-de-interfaces-de-usuario-ui/ es solo una guia
-# Si quieres hacerlo mejor pues bienvenido, Muestra los valores de la longitud de los pistones y el angulo del espejo
-
-
 # Función de costo para la optimización
 def costo(pos, A, B_min, B_max, C, x1, y1, F):
     x2, y2 = pos
-    PA1_base = np.array([-A / 2, 0])
-    PA2_base = np.array([A / 2, 0])
-    espejo_primario = np.array([PA1_base[0] + F, 0])  # Espejo primario fijo
+    PA1_base = np.array([-A / 2, 0])  # Aseguramos que PA1 esté a la izquierda del origen
+    PA2_base = np.array([A / 2, 0])   # PA2 estará a la derecha del origen
+    espejo_primario = np.array([0 + F, 0])  # Espejo primario ajustado respecto al origen
 
     vector_P = np.array([x1 - x2, y1 - y2])
     vector_L = np.array([-(y1 - y2), x1 - x2])
@@ -79,7 +72,7 @@ def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
 
         PA1_base = np.array([-A / 2, 0])
         PA2_base = np.array([A / 2, 0])
-        espejo_primario = np.array([PA1_base[0] + F, 0])
+        espejo_primario = np.array([0 + F, 0])
         vector_P = np.array([x1_new - x2_opt, y1_new - y2_opt])
         vector_L = np.array([-(y1_new - y2_opt), x1_new - x2_opt])
 
@@ -113,6 +106,13 @@ def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
                   label=r"$\vec{P}$")
         ax.quiver(x2_opt, y2_opt, vector_L[0], vector_L[1], angles='xy', scale_units='xy', scale=1, color='purple',
                   label=r"$\vec{L}$")
+
+        # Añadir cuadro con la información relevante
+        info_text = f"Coordenadas P: ({x1_new:.2f}, {y1_new:.2f})\n"
+        info_text += f"Pistón 1: {piston1:.2f} m\nPistón 2: {piston2:.2f} m\nÁngulo: {angulo_P:.2f}°"
+        ax.text(0.7, 1, info_text, transform=ax.transAxes, fontsize=12, verticalalignment='top',
+                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
+
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         ax.set_title('Telescopio Espacial')
@@ -138,11 +138,17 @@ def crear_interfaz():
             B_min = float(entry_B_min.get())
             B_max = float(entry_B_max.get())
             C = float(entry_C.get())  # Nuevo campo para C
-            F = 3
+            F = float(entry_F.get())  # Obtener el valor de F desde la interfaz
+
+            # Validar que F esté en el rango adecuado
+            if F < -A / 2 or F > A / 2:
+                messagebox.showerror("Error", f"El valor de F debe estar en el rango [-{A / 2}, {A / 2}]")
+                return
+
             x1 = -2
             y1 = 6.5
             prototipo_telescopio(A, B_min, B_max, C, F, x1, y1)
-            root.destroy()
+
         except ValueError:
             messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos.")
 
@@ -165,6 +171,10 @@ def crear_interfaz():
     tk.Label(root, text="Valor de C:").pack(padx=10, pady=5)
     entry_C = tk.Entry(root)
     entry_C.pack(padx=10, pady=5)
+
+    tk.Label(root, text="Valor de F:").pack(padx=10, pady=5)  # Label para F
+    entry_F = tk.Entry(root)  # Campo para F
+    entry_F.pack(padx=10, pady=5)
 
     # Submit button
     submit_button = tk.Button(root, text="Iniciar", command=on_submit)
