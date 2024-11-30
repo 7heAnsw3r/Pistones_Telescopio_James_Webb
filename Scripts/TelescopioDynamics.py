@@ -6,6 +6,24 @@ import matplotlib.pyplot as plt
 
 # Función de costo para la optimización
 def costo(pos, A, B_min, B_max, C, x1, y1, F):
+    """
+    Calcula el costo de un sistema de pistones para el control de la longitud de los pistones, 
+    el ángulo de un espejo y la alineación con el Foco. La función penaliza configuraciones que 
+    no cumplan con ciertos rangos establecidos.
+
+    Parámetros:
+    pos (tuple): Tupla de dos elementos (x2, y2) que representa la posición inicial de la estructura.
+    A (float): Ancho total de la estructura Base.
+    B_min (float): Longitud mínima permitida para los pistones.
+    B_max (float): Longitud máxima permitida para los pistones.
+    C (float): Factor para determinar la longitud de ajuste del espejo.
+    x1 (float): Coordenada x de la estrella.
+    y1 (float): Coordenada y de la estrella.
+    F (float): Foco del Espejo Primario.
+
+    Retorna:
+    float: Aliniacion con el foco del espejo primario, penalizacion de longitud para los pistones y para el angulo del espejo.
+    """
     x2, y2 = pos
     PA1_base = np.array([-A / 2, 0])  # Aseguramos que PA1 esté a la izquierda del origen
     PA2_base = np.array([A / 2, 0])   # PA2 estará a la derecha del origen
@@ -48,11 +66,36 @@ def costo(pos, A, B_min, B_max, C, x1, y1, F):
 
 
 # Función para graficar y optimizar el telescopio
-def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
+def prototipo_telescopio(A, B_min, B_max, C, F):
+    """
+    Genera y muestra una visualización interactiva de un telescopio espacial, donde la posición de una estrella 
+    puede ser movida con el mouse. A medida que la estrella se mueve, el sistema de 
+    pistones se ajusta automáticamente utilizando un algoritmo de optimización, y los resultados se muestran 
+    gráficamente en tiempo real.
+
+    Parámetros:
+    A (float): Ancho total de la estructura Base.
+    B_min (float): Longitud mínima permitida para los pistones.
+    B_max (float): Longitud máxima permitida para los pistones.
+    C (float): Factor para determinar la longitud de ajuste del espejo.
+    F (float): Foco del Espejo Primario.
+
+    No retorna, muestra una figura interactiva del telescopio.
+    """
     # Crear la figura
     fig, ax = plt.subplots(figsize=(10, 10))
 
     def update_plot(event):
+        """
+        Actualiza la visualización del telescopio cuando el usuario mueve el mouse en la ventana gráfica.
+
+        Parámetros:
+        event (matplotlib.backend_bases.MouseEvent): El evento del mouse que contiene las nuevas coordenadas 
+                                                    de la estrella cuando se mueve el cursor.
+        
+        No retorna nada. Actualiza la gráfica en tiempo real con los nuevos valores calculados para la posición 
+        del espejo y los pistones.
+        """
         # Limitar la posición del mouse
         x1_new, y1_new = event.xdata, event.ydata
 
@@ -131,7 +174,27 @@ def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
 
 # Función para crear la interfaz gráfica
 def crear_interfaz():
+    """
+    Crea una interfaz gráfica de usuario utilizando Tkinter.
+    La interfaz permite al usuario ingresar parámetros como las dimensiones del telescopio (base, 
+    longitud de los pistones, longitud del espejo y valor del foco) y valida las entradas antes de ejecutar la 
+    simulación. 
+
+    La interfaz incluye campos de entrada para los valores y un botón de envío para iniciar la simulación.
+
+    No retorna nada. Muestra una ventana con los campos de entrada y un botón para ejecutar la simulación.
+    """
     def on_submit():
+        """
+        Se ejecuta al presionar el botón "Iniciar Simulación" en la interfaz. Esta función
+        obtiene los valores ingresados en los campos de entrada, valida que sean correctos, y luego llama a la 
+        función `prototipo_telescopio` con los parámetros especificados.
+
+        Si los valores no son válidos (por ejemplo, si son negativos o no numéricos), muestra un mensaje de error 
+        utilizando un cuadro de diálogo.
+
+        No retorna nada. Muestra mensajes de error si no se ingresan valores permitidos.
+        """
         try:
             A = float(entry_A.get())
             B_min = float(entry_B_min.get())
@@ -149,9 +212,7 @@ def crear_interfaz():
                 messagebox.showerror("Error", f"El valor de F debe estar en el rango [-{A / 2}, {A / 2}]")
                 return
 
-            x1 = -2
-            y1 = 6.5
-            prototipo_telescopio(A, B_min, B_max, C, F, x1, y1)
+            prototipo_telescopio(A, B_min, B_max, C, F)
 
         except ValueError:
             messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos.")

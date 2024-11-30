@@ -2,6 +2,17 @@ import subprocess
 import sys
 
 def install_requirements():
+    """
+    Lee el archivo 'requirements.txt', extrae las librerías mencionadas en cada línea e instala 
+    cada una de ellas utilizando pip.
+    
+    El archivo 'requirements.txt' debe contener una lista de librerías, una por línea.
+
+    No retorna nada. Si alguna de las instalaciones falla, la función lanzará una excepción.
+
+    Excepciones:
+        subprocess.CalledProcessError: Si alguna instalación falla, esta excepción será lanzada.
+    """
     # Abre el archivo requirements.txt y lee las líneas
     with open('requirements.txt', 'r') as file:
         libraries = file.readlines()
