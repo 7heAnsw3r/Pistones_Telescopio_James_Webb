@@ -58,24 +58,24 @@ El repositorio está seccionado por carpetas, las cuales tienen nombres descript
 - El directorio **Requerimientos** contiene los archivos necesarios para instalar las librerías requeridas por el programa.
 - El directorio **Scripts** contiene los códigos de las aplicaciones desarrolladas para el proyecto, una simulación en fase Beta y el código principal `TelescopioDynamics.py`.
 
-**Estructura del código**
+**Estructura del código:**  
 Este basa su estructura en funciones cada una una descrita mediante el uso de **DocStrings**.
 
 ---
 
 ## ▶️ Uso
-**Windows:**
+**Windows:**  
 Para ejecutar el programa en Windows podemos hacer uso de una aplicación que compile código, como por ejemplo: Visual Studio Code o ejecutando el siguiente comando desde la PowerShell de Windows desde el direcctorio que contiene al programa:
 ```shell
 python TelescopioDynamics.py
 ```
 
-**Linux**
+**Linux:**  
 Simplemente ejecutamos el siguiente comando desde la Terminal:
 ```shell
 python3 TelescopioDynamics.py
 ```
-**Indicaciones:**
+**Indicaciones:**  
 Una vez ejecutado seguir los siguientes pasos:
 - Esperar que aparezca la interfaz gráfica.
 - Ingresar los datos requeridos en la interfaz, respetando las restricciones.
@@ -88,7 +88,7 @@ Una vez ejecutado seguir los siguientes pasos:
 
 Como se dijo antes las funciones ya contienen DocStrings, herramienta de documentación para el código el cual nos dice de manera clara el uso de la función, sus parametros de entrada y lo que retorna; o que acción realiza en caso de no retornar valores.  
 Sin Embargo, vamos a explorar más a detalle las características de las funciones mas importantes del código:  
-### **Función Costo**
+### **Función Costo**  
 ```python
 def costo(pos, A, B_min, B_max, C, x1, y1, F):
     """
