@@ -1,10 +1,95 @@
-import tkinter as tk
-from tkinter import messagebox
-from scipy.optimize import minimize
-import numpy as np
-import matplotlib.pyplot as plt
+# 🔭 Proyecto de Métodos Numéricos: Orientación del Espejo Secundario del Telescopio
 
-# Función de costo para la optimización
+Este proyecto aborda el diseño de un modelo simplificado del mecanismo de ajuste del espejo secundario en el telescopio James Webb. Usaremos un enfoque de métodos numéricos para calcular la extensión de dos pistones lineales que permiten orientar el espejo secundario hacia un punto específico en el espacio.
+
+---
+
+## Tabla de Contenidos
+1. [Introducción](#descripción-del-Proyecto)
+2. [Requisitos Previos](#objetivo-del-proyecto)
+3. [Instalación](#instalación)
+4. [Estructura del Proyecto](#estructura-del-proyecto)
+5. [Uso](#uso)
+6. [Documentación del Código](#documentación-del-código)
+
+---
+
+## 📄 Descripción del Proyecto
+
+El proyecto busca orientar el espejo secundario de un telescopio perpendicularmente a un punto cuyo movimiento es controlado mediante la posicion de mouse, esto mediante el movimiento de dos pistones con extension predefinida anclados a una base de longitud variable.
+
+## 🎯 Objetivo del Proyecto
+
+- **🔧 Cálculos Matemáticos:** Usar métodos numéricos para determinar la posicion del espejo y los pistones para ajustarse de manera perpendicular a la estrella.
+- **💻 Interfaz Gráfica:** Desarrollar una interfaz que permita ingresar parámetros y visualizar la orientación del espejo de manera dinamica.
+
+---
+
+## 🛠️ Instalacción
+
+**Requisitos previos:**
+* Sistema operativo Linux o Windows
+* Tener Python3 Instalado
+* Tener instalado Pip3
+
+Para hacer uso del codigo debemos seguir los siguientes pasos ya sea en la consola propia del sistema operativo Linux, PowerShell o La consola de Visual Studio Code:
+- **Clonar el repositorio:**
+```shell
+git clone https://github.com/7heAnsw3r/Pistones_Telescopio_James_Webb.git
+```
+- **Instalar librerias requeridas**
+Debe Colocarse en el direcctorio clonado previamente
+```shell
+cd Pistones_Telescopio_James_Webb/Requerimientos
+```
+y posteriormente ejecutar el script llamado `Instalar_requerimientos.py` de la siguiente manera (Linux: usar `sudo` en caso de requerir permisos de super usuario):
+```shell
+python3 install_requirements.py
+```
+
+---
+
+## 📂 Estructura del proyecto
+
+**Directorios y Ficheros:**  
+El repositorio esta seccionado por carpetas, estas se encuentran con nombres descriptivos que señalan lo que contienen:
+- En la raiz tenemos un notebook con el desarrollo del sistemas de ecuaciones y un archivo README.md
+- El directorio Imagenes contiene ilustraciones representativas del telescopio del cual basamos el prototipo.
+- El directorio Requerimientos contiene los arhivos ncesarios para instalar las librerias requeridas por el programa.
+- El directorio Scripts contiene los codigos de las aplicaciones desarrolladas para el proyecto, una simulacion fase Beta y el codigo principal `TelescopioDynamics.py`.
+
+**Estructura del código**
+Este basa su estructura en funciones cada una una descrita mediante el uso de Docstrings.
+
+---
+
+## ▶️ Uso
+**Windows:**
+Para ejecutar el programa en Windows podemos hacer uso de un programa que compile codigo como por ejemplo Visual Studio Code o ejecutando el siguinete comando desde la PowerShell de Windows desde el direcctorio que contiene al programa:
+```shell
+python TelescopioDynamics.py
+```
+
+**Linux**
+Simplemente ejecutamos el siguiente comando desde la Terminal:
+```shell
+python3 TelescopioDynamics.py
+```
+**Indicaciones:**
+Una vez ejecutado seguir los siguientes pasos:
+- Esperar que aparezca la interfaz grafica.
+- Ingresar los datos requeridos en la interfaz, respetando las restricciones.
+- Iniciar la simulación.
+- Interactuar con el programa.
+
+---
+
+## 🧩 Documentación del Código
+
+Como se dijo antes las funciones ya contienen DocStrings, herramienta de documentacion para el codigo el cual nos dice de manera clara el uso de la funcion, sus parametros de entrada y lo que retorna o que accion realiza en caso de no retornar.  
+Sin Embargo, vamos a explorar un poco mas a detalle las caracteristicas de las funciones mas importantes del codigo:  
+### **Función Costo**
+```python
 def costo(pos, A, B_min, B_max, C, x1, y1, F):
     """
     Calcula el costo de un sistema de pistones para el control de la longitud de los pistones, 
@@ -63,9 +148,23 @@ def costo(pos, A, B_min, B_max, C, x1, y1, F):
     alineacion = np.linalg.norm(np.cross(vector_P_3D, vector_espejo_3D)) / np.linalg.norm(vector_P_3D)
 
     return alineacion + penalizacion_longitud + penalizacion_angulo
+```
 
+#### Cálculos Realizados
+1. **Alineación con el Foco**:
+   Se calcula la **distancia perpendicular** entre el vector de orientación del espejo y el vector hacia el foco (usando el producto cruzado entre vectores en 3D).
+   
+2. **Penalización por Longitud de los Pistones**:
+   Se calcula la distancia de los pistones y se compara con los rangos permitidos (`B_min` y `B_max`). Si las longitudes no están dentro del rango, se aplica una penalización proporcional a la desviación.
 
-# Función para graficar y optimizar el telescopio
+3. **Penalización por Ángulo**:
+   Se calcula el **ángulo** entre el vector hacia el punto objetivo y el eje de orientación. Si el ángulo se encuentra fuera del rango de 0 a 180 grados, se penaliza con la diferencia respecto a los 90 grados.
+
+#### Resultado Final
+La función retorna la **suma de las penalizaciones** por alineación, longitud de pistones y ángulo. Un valor más bajo indica una configuración más óptima, mientras que valores más altos sugieren que el sistema está fuera de los rangos deseados
+
+### **Función Telescopio**
+```python
 def telescopio(A, B_min, B_max, C, F):
     """
     Genera y muestra una visualización interactiva de un telescopio espacial, donde la posición de una estrella 
@@ -173,85 +272,23 @@ def telescopio(A, B_min, B_max, C, F):
 
     # Mostrar la figura inicialmente
     plt.show()
+```
+#### Cálculos Realizados en la Función `telescopio`
 
-# Función para crear la interfaz gráfica
-def crear_interfaz():
-    """
-    Crea una interfaz gráfica de usuario utilizando Tkinter.
-    La interfaz permite al usuario ingresar parámetros como las dimensiones del telescopio (base, 
-    longitud de los pistones, longitud del espejo y valor del foco) y valida las entradas antes de ejecutar la 
-    simulación. 
+1. **Optimización de la Posición del Telescopio**:
+   - La posición de la estrella (`x1_new`, `y1_new`) se obtiene mediante el movimiento del mouse.
+   - Se utiliza la función `minimize` para encontrar las coordenadas óptimas de la base del telescopio (`x2_opt`, `y2_opt`), de manera que se minimice el "costo" de la configuración.
 
-    Args:
-        La interfaz incluye campos de entrada para los valores y un botón de envío para iniciar la simulación.
+2. **Cálculo de las Coordenadas del Espejo Secundario**:
+   - Se calculan las posiciones de los puntos `PA3_espejo` y `PA4_espejo`, que corresponden a los extremos del espejo secundario, a partir de las coordenadas óptimas obtenidas mediante la optimización y el ángulo calculado entre la estrella y el telescopio. Estos puntos se ajustan en función del **factor de ajuste del espejo** `C`.
 
-    Return:
-        No retorna nada. Muestra una ventana con los campos de entrada y un botón para ejecutar la simulación.
-    """
-    def on_submit():
-        """
-        Se ejecuta al presionar el botón "Iniciar Simulación" en la interfaz. Esta función
-        obtiene los valores ingresados en los campos de entrada, valida que sean correctos, y luego llama a la 
-        función `prototipo_telescopio` con los parámetros especificados.
+3. **Cálculo de las Longitudes de los Pistones**:
+   - La longitud de cada pistón (`piston1` y `piston2`) se calcula como la distancia entre los puntos `PA1_base` y `PA3_espejo`, y entre `PA2_base` y `PA4_espejo`, respectivamente, usando la norma de los vectores correspondientes.
 
-        Args:
-            Si los valores no son válidos (por ejemplo, si son negativos o no numéricos), muestra un mensaje de error 
-        utilizando un cuadro de diálogo.
+4. **Cálculo del Ángulo del Espejo**:
+   - El ángulo del espejo se calcula mediante la función `np.arctan2`, que determina el ángulo entre el vector de la estrella y el telescopio (`vector_P`), en relación con el eje horizontal (eje `x`). El valor resultante se convierte de radianes a grados utilizando `np.degrees`.
 
-        Return:
-            No retorna nada. Muestra mensajes de error si no se ingresan valores permitidos.
-        """
-        try:
-            A = float(entry_A.get())
-            B_min = float(entry_B_min.get())
-            B_max = float(entry_B_max.get())
-            C = float(entry_C.get())  # Nuevo campo para C
-            F = float(entry_F.get())  # Obtener el valor de F desde la interfaz
+5. **Actualización y Visualización Gráfica**:
+   - La visualización gráfica se actualiza en tiempo real utilizando `matplotlib`, mostrando la configuración actual del telescopio con los puntos relevantes: la base, los pistones, el espejo secundario, y la estrella.
+   - Se dibujan las flechas que representan los vectores de orientación (`vector_P` y `vector_L`).
 
-            # Validar que A, B_min, B_max y C no sean negativos
-            if A < 0 or B_min < 0 or B_max < 0 or C < 0:
-                messagebox.showerror("Error", "Los valores de A, B_min, B_max y C no pueden ser negativos.")
-                return
-
-            # Validar que F esté en el rango adecuado
-            if F < -A / 2 or F > A / 2:
-                messagebox.showerror("Error", f"El valor de F debe estar en el rango [-{A / 2}, {A / 2}]")
-                return
-
-            telescopio(A, B_min, B_max, C, F)
-
-        except ValueError:
-            messagebox.showerror("Error", "Por favor ingrese valores numéricos válidos.")
-
-    root = tk.Tk()
-    root.title("Configuración del Telescopio")
-
-    # Labels and entry fields
-    tk.Label(root, text="Longitud de la Base:").pack(padx=10, pady=5)
-    entry_A = tk.Entry(root)
-    entry_A.pack(padx=10, pady=5)
-
-    tk.Label(root, text="Longitud mínima de los pistones:").pack(padx=10, pady=5)
-    entry_B_min = tk.Entry(root)
-    entry_B_min.pack(padx=10, pady=5)
-
-    tk.Label(root, text="Longitud máxima de los pistones:").pack(padx=10, pady=5)
-    entry_B_max = tk.Entry(root)
-    entry_B_max.pack(padx=10, pady=5)
-
-    tk.Label(root, text="Longitud del Espejo").pack(padx=10, pady=5)
-    entry_C = tk.Entry(root)
-    entry_C.pack(padx=10, pady=5)
-
-    tk.Label(root, text="Valor del Foco:").pack(padx=10, pady=5)  # Label para F
-    entry_F = tk.Entry(root)  # Campo para F
-    entry_F.pack(padx=10, pady=5)
-
-    # Submit button
-    submit_button = tk.Button(root, text="Iniciar Simulación", command=on_submit)
-    submit_button.pack(pady=10)
-
-    root.mainloop()
-
-# Iniciar la interfaz gráfica
-crear_interfaz()
