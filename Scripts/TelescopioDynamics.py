@@ -101,17 +101,17 @@ def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
         ax.plot([PA2_base[0], PA4_espejo[0]], [PA2_base[1], PA4_espejo[1]], 'b--', label=f"Pistón 2")
         ax.plot([-A / 2, A / 2], [0, 0], 'k-', label="Base del telescopio")
         ax.plot([PA3_espejo[0], PA4_espejo[0]], [PA3_espejo[1], PA4_espejo[1]], 'r-', label="Espejo Secundario")
-        ax.plot(x1_new, y1_new, 'r*', markersize=12, label="Punto P")
+        ax.plot(x1_new, y1_new, 'r*', markersize=12, label="Estrella")
         ax.quiver(x2_opt, y2_opt, vector_P[0], vector_P[1], angles='xy', scale_units='xy', scale=1, color='orange',
                   label=r"$\vec{P}$")
         ax.quiver(x2_opt, y2_opt, vector_L[0], vector_L[1], angles='xy', scale_units='xy', scale=1, color='purple',
                   label=r"$\vec{L}$")
 
         # Añadir cuadro con la información relevante
-        info_text = f"Coordenadas P: ({x1_new:.2f}, {y1_new:.2f})\n"
-        info_text += f"Pistón 1: {piston1:.2f} m\nPistón 2: {piston2:.2f} m\nÁngulo: {angulo_P:.2f}°"
+        info_text = f"Coordenadas_Estrella: ({x1_new:.2f}, {y1_new:.2f})\n"
+        info_text += f"Pistón 1: {piston1:.2f} m\nPistón 2: {piston2:.2f} m\nÁngulo_espejo: {angulo_P:.2f}°"
         ax.text(0.7, 1, info_text, transform=ax.transAxes, fontsize=12, verticalalignment='top',
-                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.3'))
+                bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.1'))
 
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
@@ -129,7 +129,6 @@ def prototipo_telescopio(A, B_min, B_max, C, F, x1, y1):
     # Mostrar la figura inicialmente
     plt.show()
 
-
 # Función para crear la interfaz gráfica
 def crear_interfaz():
     def on_submit():
@@ -139,6 +138,11 @@ def crear_interfaz():
             B_max = float(entry_B_max.get())
             C = float(entry_C.get())  # Nuevo campo para C
             F = float(entry_F.get())  # Obtener el valor de F desde la interfaz
+
+            # Validar que A, B_min, B_max y C no sean negativos
+            if A < 0 or B_min < 0 or B_max < 0 or C < 0:
+                messagebox.showerror("Error", "Los valores de A, B_min, B_max y C no pueden ser negativos.")
+                return
 
             # Validar que F esté en el rango adecuado
             if F < -A / 2 or F > A / 2:
@@ -156,33 +160,31 @@ def crear_interfaz():
     root.title("Configuración del Telescopio")
 
     # Labels and entry fields
-    tk.Label(root, text="Valor de A:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud de la Base:").pack(padx=10, pady=5)
     entry_A = tk.Entry(root)
     entry_A.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Valor de B_min:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud mínima de los pistones:").pack(padx=10, pady=5)
     entry_B_min = tk.Entry(root)
     entry_B_min.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Valor de B_max:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud máxima de los pistones:").pack(padx=10, pady=5)
     entry_B_max = tk.Entry(root)
     entry_B_max.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Valor de C:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud del Espejo").pack(padx=10, pady=5)
     entry_C = tk.Entry(root)
     entry_C.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Valor de F:").pack(padx=10, pady=5)  # Label para F
+    tk.Label(root, text="Valor del Foco:").pack(padx=10, pady=5)  # Label para F
     entry_F = tk.Entry(root)  # Campo para F
     entry_F.pack(padx=10, pady=5)
 
     # Submit button
-    submit_button = tk.Button(root, text="Iniciar", command=on_submit)
+    submit_button = tk.Button(root, text="Iniciar Simulación", command=on_submit)
     submit_button.pack(pady=10)
 
     root.mainloop()
 
-
 # Iniciar la interfaz gráfica
 crear_interfaz()
-
