@@ -16,23 +16,23 @@ Este proyecto aborda el diseño de un modelo simplificado del mecanismo de ajust
 
 ## 📄 Descripción del Proyecto
 
-El proyecto busca orientar el espejo secundario de un telescopio perpendicularmente a un punto cuyo movimiento es controlado mediante la posicion de mouse, esto mediante el movimiento de dos pistones con extension predefinida anclados a una base de longitud variable.
+El proyecto busca orientar el espejo secundario de un telescopio perpendicularmente a un punto cuyo movimiento es controlado mediante la posición del mouse, esto mediante el movimiento de dos pistones con extensión predefinida anclados a una base de longitud variable.
 
 ## 🎯 Objetivo del Proyecto
 
 - **🔧 Cálculos Matemáticos:** Usar métodos numéricos para determinar la posicion del espejo y los pistones para ajustarse de manera perpendicular a la estrella.
-- **💻 Interfaz Gráfica:** Desarrollar una interfaz que permita ingresar parámetros y visualizar la orientación del espejo de manera dinamica.
+- **💻 Interfaz Gráfica:** Desarrollar una interfaz que permita ingresar parámetros y visualizar la orientación del espejo de manera dinámica.
 
 ---
 
 ## 🛠️ Instalacción
 
 **Requisitos previos:**
-* Sistema operativo Linux o Windows
-* Tener Python3 Instalado
-* Tener instalado Pip3
+* Sistema operativo Linux o Windows.
+* Tener Python3 Instalado.
+* Tener instalado Pip3.
 
-Para hacer uso del codigo debemos seguir los siguientes pasos ya sea en la consola propia del sistema operativo Linux, PowerShell o La consola de Visual Studio Code:
+Para hacer uso del código debemos seguir los siguientes pasos, ya sea en la consola propia del sistema operativo Linux, PowerShell o La consola de Visual Studio Code:
 - **Clonar el repositorio:**
 ```shell
 git clone https://github.com/7heAnsw3r/Pistones_Telescopio_James_Webb.git
@@ -52,20 +52,20 @@ python3 install_requirements.py
 ## 📂 Estructura del proyecto
 
 **Directorios y Ficheros:**  
-El repositorio esta seccionado por carpetas, estas se encuentran con nombres descriptivos que señalan lo que contienen:
-- En la raiz tenemos un notebook con el desarrollo del sistemas de ecuaciones y un archivo README.md
-- El directorio Imagenes contiene ilustraciones representativas del telescopio del cual basamos el prototipo.
-- El directorio Requerimientos contiene los arhivos ncesarios para instalar las librerias requeridas por el programa.
-- El directorio Scripts contiene los codigos de las aplicaciones desarrolladas para el proyecto, una simulacion fase Beta y el codigo principal `TelescopioDynamics.py`.
+El repositorio está seccionado por carpetas, las cuales tienen nombres descriptivos que señalan lo que contienen:
+- En la raíz tenemos un notebook con el desarrollo del sistema de ecuaciones y un archivo README.md.
+- El directorio **Imagenes** contiene ilustraciones representativas del telescopio del cual basamos el prototipo.
+- El directorio **Requerimientos** contiene los archivos necesarios para instalar las librerías requeridas por el programa.
+- El directorio **Scripts** contiene los códigos de las aplicaciones desarrolladas para el proyecto, una simulación en fase Beta y el código principal `TelescopioDynamics.py`.
 
 **Estructura del código**
-Este basa su estructura en funciones cada una una descrita mediante el uso de Docstrings.
+Este basa su estructura en funciones cada una una descrita mediante el uso de **DocStrings**.
 
 ---
 
 ## ▶️ Uso
 **Windows:**
-Para ejecutar el programa en Windows podemos hacer uso de un programa que compile codigo como por ejemplo Visual Studio Code o ejecutando el siguinete comando desde la PowerShell de Windows desde el direcctorio que contiene al programa:
+Para ejecutar el programa en Windows podemos hacer uso de una aplicación que compile código, como por ejemplo: Visual Studio Code o ejecutando el siguiente comando desde la PowerShell de Windows desde el direcctorio que contiene al programa:
 ```shell
 python TelescopioDynamics.py
 ```
@@ -77,7 +77,7 @@ python3 TelescopioDynamics.py
 ```
 **Indicaciones:**
 Una vez ejecutado seguir los siguientes pasos:
-- Esperar que aparezca la interfaz grafica.
+- Esperar que aparezca la interfaz gráfica.
 - Ingresar los datos requeridos en la interfaz, respetando las restricciones.
 - Iniciar la simulación.
 - Interactuar con el programa.
@@ -86,8 +86,8 @@ Una vez ejecutado seguir los siguientes pasos:
 
 ## 🧩 Documentación del Código
 
-Como se dijo antes las funciones ya contienen DocStrings, herramienta de documentacion para el codigo el cual nos dice de manera clara el uso de la funcion, sus parametros de entrada y lo que retorna o que accion realiza en caso de no retornar.  
-Sin Embargo, vamos a explorar un poco mas a detalle las caracteristicas de las funciones mas importantes del codigo:  
+Como se dijo antes las funciones ya contienen DocStrings, herramienta de documentación para el código el cual nos dice de manera clara el uso de la función, sus parametros de entrada y lo que retorna; o que acción realiza en caso de no retornar valores.  
+Sin Embargo, vamos a explorar más a detalle las características de las funciones mas importantes del código:  
 ### **Función Costo**
 ```python
 def costo(pos, A, B_min, B_max, C, x1, y1, F):
