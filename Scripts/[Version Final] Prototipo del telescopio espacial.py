@@ -205,12 +205,22 @@ def crear_interfaz():
             A = float(entry_A.get())
             B_min = float(entry_B_min.get())
             B_max = float(entry_B_max.get())
-            C = float(entry_C.get())  # Nuevo campo para C
-            F = float(entry_F.get())  # Obtener el valor de F desde la interfaz
+            C = float(entry_C.get())
+            F = float(entry_F.get()) 
 
             # Validar que A, B_min, B_max y C no sean negativos
             if A < 0 or B_min < 0 or B_max < 0 or C < 0:
                 messagebox.showerror("Error", "Los valores de A, B_min, B_max y C no pueden ser negativos.")
+                return
+
+            # Validar que B_min sea la mitad de B_max
+            if B_min != B_max / 2:
+                messagebox.showerror("Error", "El valor de B_min debe ser exactamente la mitad de B_max.")
+                return
+
+            # Validar que C sea menor que A
+            if C >= A:
+                messagebox.showerror("Error", "El valor de C debe ser menor que A.")
                 return
 
             # Validar que F esté en el rango adecuado
@@ -218,6 +228,7 @@ def crear_interfaz():
                 messagebox.showerror("Error", f"El valor de F debe estar en el rango [-{A / 2}, {A / 2}]")
                 return
 
+            # Llamar a la función telescopio con los valores validados
             telescopio(A, B_min, B_max, C, F)
 
         except ValueError:
@@ -227,23 +238,23 @@ def crear_interfaz():
     root.title("Configuración del Telescopio")
 
     # Labels and entry fields
-    tk.Label(root, text="Longitud de la Base:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud de la Base (A):").pack(padx=10, pady=5)
     entry_A = tk.Entry(root)
     entry_A.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Longitud mínima de los pistones:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud mínima de los pistones (B_min):").pack(padx=10, pady=5)
     entry_B_min = tk.Entry(root)
     entry_B_min.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Longitud máxima de los pistones:").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud máxima de los pistones (B_max):").pack(padx=10, pady=5)
     entry_B_max = tk.Entry(root)
     entry_B_max.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Longitud del Espejo").pack(padx=10, pady=5)
+    tk.Label(root, text="Longitud del Espejo (C):").pack(padx=10, pady=5)
     entry_C = tk.Entry(root)
     entry_C.pack(padx=10, pady=5)
 
-    tk.Label(root, text="Valor del Foco:").pack(padx=10, pady=5)  # Label para F
+    tk.Label(root, text="Valor del Foco (F):").pack(padx=10, pady=5)  # Label para F
     entry_F = tk.Entry(root)  # Campo para F
     entry_F.pack(padx=10, pady=5)
 
