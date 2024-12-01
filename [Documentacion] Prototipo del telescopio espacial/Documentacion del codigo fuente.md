@@ -67,13 +67,13 @@ Este basa su estructura en funciones cada una una descrita mediante el uso de **
 **Windows:**  
 Para ejecutar el programa en Windows podemos hacer uso de una aplicación que compile código, como por ejemplo: Visual Studio Code o ejecutando el siguiente comando desde la PowerShell de Windows desde el direcctorio que contiene al programa:
 ```shell
-python TelescopioDynamics.py
+python [Version Final] Prototipo del telescopio espacial.py
 ```
 
 **Linux:**  
 Simplemente ejecutamos el siguiente comando desde la Terminal:
 ```shell
-python3 TelescopioDynamics.py
+python3 [Version Final] Prototipo del telescopio espacial.py
 ```
 **Indicaciones:**  
 Una vez ejecutado seguir los siguientes pasos:
